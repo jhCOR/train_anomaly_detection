@@ -1,37 +1,38 @@
-from nptdms import TdmsFile
 from ..toolkit.plotClass import PlotManager
 from ..toolkit.tdmsClass import TdmsClass
 
+from tqdm import tqdm
+from nptdms import TdmsFile
+import math
 def main():
     
     prefix = "./data/"
-    #read a tdms file
     filepath = prefix + "221108_nextgen/S206/*.tdms"
     tdmsclass = TdmsClass(filepath)
 
-    reformedData = tdmsclass.reFormData()
-    print(reformedData)
-    # tdms_file = TdmsFile(filepath)
+    tdms_datas = tdmsclass.loadTdmsData( tdmsclass.file_list )
+    tdms_datas = tdmsclass.getChannelData(tdms_datas, "LPData", "Channel")
 
-    # # 그룹 및 채널 목록 출력
-    # print("Groups in TDMS:", tdms_file.groups())
-    # print("Channels in Group:", tdms_file["LPData"].channels())
+    weight, height = tdmsclass.get_list_to_matrix_size(len(tdms_datas))
 
-    # # 데이터 읽기
-    # LPData = tdms_file["LPData"]["Channel"]
-    # LPData
+    plotmanager = PlotManager(row=weight, col=height, type='plot_numpy')
+    plot_rawaudio_list = []
+    
+    col_count = 0
+    row_count = 0
+    for i in tqdm(range(len(tdms_datas))):
 
-    # LPData_values = LPData[:]
-    # print("Data Values:", LPData_values)
+        tdms_value = tdms_datas[i]
+        row = {"content": tdms_value, "position": [col_count, row_count], "title":"TDMS"}
+        plot_rawaudio_list.append( row )
 
-    # plotmanager = PlotManager(row=1, col=1, type='plot_numpy')
+        if col_count < weight:
+            col_count = col_count+1
+        if col_count == weight:
+            row_count = row_count+1
+            col_count = 0
+    plotmanager.drawPlot(plot_rawaudio_list, save_as_file="source/result/LPData_values4.png")
 
-    # plot_rawaudio_list = [
-    #     {"content": LPData_values, "position": [0,0], "title":"TDMS"},
-    # ]
-
-    # plotmanager.drawPlot(plot_rawaudio_list, save_as_file="source/result/LPData_values3.png")
-    # return 0
 
 if __name__ == '__main__':
     main()

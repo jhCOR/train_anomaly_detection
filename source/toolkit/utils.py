@@ -9,24 +9,39 @@ class Uility():
         return 0
 
     @classmethod
-    def get_list_to_matrix_size(cls):
-        return 0
+    def get_list_to_matrix_size(cls, lists):
+        assert ObjectHelper.is_NestedIterable(lists) is False, "Only for 1D list"
+        
+        weight = cls.get_square_range(lists)
+        height = math.ceil( len(tdms_datas)/weight)
+        return weight, height
 
     @classmethod
     def get_square_range(cls, length):
         square_root = math.ceil(length ** 0.5)
         return square_root
 
+    def reFormShape(self, lists, row=None, col=None):
+        numpy_list = np.array(lists)
+        self.size = self.get_square_range(len(numpy_list))
+        padded_list = self.paddingList(self.size*self.size, numpy_list)
+
+        row_length = self.size if row is None else row
+        col_length = -1 if col is None else col
+
+        reshaped_list = np.reshape(padded_list, (row_length, col_length))
+        return reshaped_list
+
     def paddingList(self, amount, lists):
         if isinstance(lists, np.ndarray):
             lists = lists.tolist()
             for i in range(amount-len(lists)):
-                lists.append('')
+                lists.append(lists[-1])
+            print(lists)
             lists = np.array(lists)
         else:
             for i in range(amount-len(lists)):
-                lists.append([])
-        
+                lists.append(lists[-1])
         return lists
 
     def extract_number(self, filename):

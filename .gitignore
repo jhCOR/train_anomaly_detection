@@ -2,4 +2,6 @@ __pycache__/
 
 *.tdms
 anomal_venv
+
 data/221108_nextgen/*
+source/result/*
