@@ -40,11 +40,25 @@ class TdmsClass(Uility):
     def getChannelData(self, tdms_datas, group, channel):
         if ObjectHelper.isIterable(tdms_datas) is False:
             tdms_datas = [tdms_datas]
-        lists = [tdms[str(group)][str(channel)][:] for tdms in tdms_datas ]
+
+        lists = []
+        error_count = 0
+        for tdms in tdms_datas:
+            try:
+                lists.append( tdms[str(group)][str(channel)][:] )
+            except Exception as e:
+                print(error_count, " => ", e)
+                if error_count == 0:
+                    self.showChannelInfo(tdms)
+                error_count = error_count + 1
         return lists
 
-    def getinfo(self, tdms_file):
+    def showGroupinfo(self, tdms_file):
         group_list = tdms_file.groups()
         print("Groups in TDMS:", group_list)
+        return group_list
+
+    def showChannelInfo(self, tdms_file):
+        group_list = tdms_file.groups()
         for group in group_list:
             print("Channels in Group:", tdms_file[group.name].channels())

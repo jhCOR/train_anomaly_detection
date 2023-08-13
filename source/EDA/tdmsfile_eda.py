@@ -31,8 +31,8 @@ def main():
         if col_count == weight:
             row_count = row_count+1
             col_count = 0
-    plotmanager.drawPlot(plot_rawaudio_list, save_as_file="source/result/LPData_values4.png")
-
+    plotmanager.drawPlot(plot_rawaudio_list, 
+    save_as_file="source/result/221108_nextgen_LPData_values.png")
 
 if __name__ == '__main__':
     main()
