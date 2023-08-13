@@ -10,10 +10,9 @@ class Uility():
 
     @classmethod
     def get_list_to_matrix_size(cls, lists):
-        assert ObjectHelper.is_NestedIterable(lists) is False, "Only for 1D list"
         
-        weight = cls.get_square_range(lists)
-        height = math.ceil( len(tdms_datas)/weight)
+        weight = cls.get_square_range(len(lists))
+        height = math.ceil( len(lists)/weight)
         return weight, height
 
     @classmethod

@@ -13,7 +13,7 @@ def main():
     tdms_datas = tdmsclass.loadTdmsData( tdmsclass.file_list )
     tdms_datas = tdmsclass.getChannelData(tdms_datas, "LPData", "Channel")
 
-    weight, height = tdmsclass.get_list_to_matrix_size(len(tdms_datas))
+    weight, height = tdmsclass.get_list_to_matrix_size(tdms_datas)
 
     plotmanager = PlotManager(row=weight, col=height, type='plot_numpy')
     plot_rawaudio_list = []

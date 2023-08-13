@@ -1,4 +1,4 @@
-from .utils import Uility
+from .utils import Uility, ObjectHelper
 import glob
 import numpy as np
 from nptdms import TdmsFile
