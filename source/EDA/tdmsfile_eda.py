@@ -14,8 +14,8 @@ def main(paths):
     filepath, json_filepath, filename = paths
     filepath = prefix + filepath
     json_filepath = prefix + json_filepath
-    # filepath = prefix + "221108_nextgen/S206/*.tdms"
-    # json_filepath = prefix + "train_json/221108_차세대전동차/*.json"
+    #group = property.get('group')
+    #channel = property.get('channel')
 
     tdmsclass = TdmsClass(filepath)
     filled_list = Uility.fillingForNumeric( copy.copy(tdmsclass.file_list) ) #중간에 비어있거나 txt파일인 경우 None으로 채워넣기
@@ -65,6 +65,7 @@ if __name__ == '__main__':
     path_list = ["221108_nextgen/S206/*.tdms", "221109_hydrogen/S206/*.tdms"]
     json_path = ["train_json/221108_차세대전동차/*.json", "train_json/221109_수소열차/*.json"]
     name_list = ["221108_nextgen_S206", "221109_hydrogen_S206"]
+    #property_list = [{"group": "LPData", "channel": "Channel"}]
     for path in zip(path_list, json_path, name_list):
         print(path)
         main(path)
