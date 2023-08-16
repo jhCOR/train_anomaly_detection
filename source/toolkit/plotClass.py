@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from .utils import ObjectHelper
+from .objectHelper import ObjectHelper
 
 plt.ion()
 class PlotManager():
@@ -9,6 +9,7 @@ class PlotManager():
         self.figure = None
         self.type_dict = {'rawaudio':self.plot_rawaudio, 'melspectrogram': self.plot_spectrogram, 'plot_numpy': self.plot_numpy}
         self.plotMethod = self.getPlotMethod(type)
+        self.data_list = [] #별도 리스트를 생성하고 싶지 않은 경우
 
     def getPlotMethod(self, type):
         return self.type_dict[type]
@@ -25,6 +26,9 @@ class PlotManager():
             axs = [[axs]]
 
         for content_dict in plot_list:
+            if content_dict is None:
+                continue
+                
             pos_1 = content_dict['position'][0]
             pos_2 = content_dict['position'][1]
 

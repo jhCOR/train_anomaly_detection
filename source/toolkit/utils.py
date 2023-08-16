@@ -1,7 +1,9 @@
-from collections.abc import Iterable
+from .objectHelper import ObjectHelper
 import re
 import math
 import numpy as np
+
+type_dict = {'str':str, "int":int}
 
 class Uility():
     @classmethod
@@ -42,7 +44,7 @@ class Uility():
             for i in range(amount-len(lists)):
                 lists.append(lists[-1])
         return lists
-
+    
     def extract_number(self, filename):
         part = r'_random_(\d{1,2})'
         target = re.sub('_random_', self.criteria, part)
@@ -60,15 +62,54 @@ class Uility():
         self.sub_criteria = sub_criteria
         return sorted(filenames, key=self.extract_number)
 
-class ObjectHelper():
     @classmethod
-    def is_NestedIterable(cls, target):
-        if cls.isIterable(target) and all(cls.isIterable(target) for sublist in target):
-            return True
-        else:
-            return False
+    def extractSubString(cls, data_list, criteria, return_type='int'):
+        data_list = data_list if ObjectHelper.isIterable(data_list) else [data_list]
 
+        part = r'_random_(\d{1,2})'
+        target = re.sub('_random_', criteria, part)
+
+        result_list = []
+        for data in data_list:
+            match = re.search(target, data)
+            type_maker = type_dict.get(return_type)
+
+            if match:
+                result_list.append( type_maker( match.group()[len(criteria):] ) )
+        return result_list
+    
     @classmethod
-    def isIterable(self, target):
-        return True if isinstance(target, Iterable) else False
+    def fillingForNumeric(cls, data_list, fill_with=None):
+        #list must be sorted!!
+
+        data_list = data_list if ObjectHelper.isIterable(data_list) else [data_list]
+        
+        number_list = cls.extractSubString(data_list, "_", "int")
+
+        for i in range(int(number_list[-1])):
+            if i+1 in number_list:
+                continue
+            else:
+                number_list.append(i+1)
+        number_list = sorted(number_list)
+
+        for i in range(len(number_list)):
+            find = False
+            for index in range(len(data_list)):
+                target = '_{0:02d}'.format(number_list[i])
+
+                if data_list[index].find(str(target)) > -1:
+                    find = True
+                    break
+            if find is False:
+                print(number_list[i])
+        data_list.insert(number_list[i]-2, None)
+        return data_list
+
+        
+
+
+
+    
+
 
