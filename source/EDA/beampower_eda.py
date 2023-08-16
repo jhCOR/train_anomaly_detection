@@ -1,4 +1,5 @@
 from ..toolkit.plotClass import PlotManager
+from ..toolkit.videoClass import VideoManager
 from ..toolkit.tdmsClass import TdmsClass
 from ..toolkit.jsonClass import JsonClass
 from ..toolkit.utils import Uility
@@ -7,6 +8,7 @@ from tqdm import tqdm
 from nptdms import TdmsFile
 import math
 import copy
+import numpy as np
 
 # tdmsclass.getChannelData(tdms_datas, "Beampower", "Beampower") 이 코드 제외하고 
 # tdms_eda와 완전히 같은데 EDA다보니 편의상 분리하였습니다. 
@@ -21,20 +23,18 @@ def main(paths):
     filled_list = Uility.fillingForNumeric( copy.copy(tdmsclass.file_list) ) #중간에 비어있거나 txt파일인 경우 None으로 채워넣기
     tdms_datas = tdmsclass.loadTdmsData( tdmsclass.file_list )
     tdms_datas = tdmsclass.getChannelData(tdms_datas, "Beampower", "Beampower")
-
+    
     weight, height = tdmsclass.get_list_to_matrix_size(tdms_datas)
 
     jsonclass = JsonClass(json_filepath)
     json_datas = jsonclass.loadJsonData( jsonclass.file_list )
 
-    plotmanager = PlotManager(row=weight, col=height, type='plot_numpy')
-    plot_rawaudio_list = []
+    videomanager = VideoManager(size=(40, 30))
 
     col_count = 0
     row_count = 0
     for i in tqdm(range(len(filled_list))):
         if (filled_list[i] is None) | (tdms_datas[i] is None) | (json_datas[i] is None):
-            plot_rawaudio_list.append( None )
             tdms_datas.insert(i, None)
 
             if col_count < weight:
@@ -47,18 +47,21 @@ def main(paths):
         tdms_value = tdms_datas[i]
         json_value = json_datas[i]
 
-        title = "Num: " + str(i) + "-> Horn " + str( json_value.get('Horn') ) + "_" + \
+        title = "Num_" + str(i) + "_Horn " + str( json_value.get('Horn') ) + "_" + \
             str( json_value.get('Car_num') ) + "_" + str( json_value.get('Position') )
-        row = {"content": tdms_value, "position": [col_count, row_count], "title":title}
-        plot_rawaudio_list.append( row )
+        filename = "source/result/" + title + "_beampower.avi"
+        
+        if isinstance(tdms_value, np.ndarray):
+            #tdms_value = np.reshape(tdms_value, (-1, 40, 30))
+            if col_count == 1:
+                print( np.shape(tdms_value) )
+                videomanager.saveVideo(filename=filename)
 
         if col_count < weight:
             col_count = col_count+1
         if col_count == weight:
             row_count = row_count+1
             col_count = 0
-    filename = "source/result/" + filename +"_Beampower_values_with_json.png"
-    plotmanager.drawPlot(plot_rawaudio_list, save_as_file=filename)
     print("done")
 
 if __name__ == '__main__':
@@ -70,3 +73,4 @@ if __name__ == '__main__':
         main(path)
 
 #파일 실행 명령: python -m source.EDA.beampower_eda
+#du -hsx * | sort -rh | head -n 10

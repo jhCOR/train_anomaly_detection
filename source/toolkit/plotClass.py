@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 from .objectHelper import ObjectHelper
+import numpy as np
 
-plt.ion()
 class PlotManager():
     def __init__(self, row=1, col=1, size=[7,3], type="melspectrogram"):
         self.row = row
@@ -11,11 +11,12 @@ class PlotManager():
         self.plotMethod = self.getPlotMethod(type)
         self.data_list = [] #별도 리스트를 생성하고 싶지 않은 경우
 
-    def getPlotMethod(self, type):
+    def getPlotMethod(self, type, dim=2):
         return self.type_dict[type]
 
     def preparePlot(self):
         plt.clf()
+        
         fig, axs = plt.subplots(self.row, self.col, figsize=(10, 6), constrained_layout=True)
         return fig, axs
 

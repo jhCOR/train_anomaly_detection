@@ -4,3 +4,5 @@ __pycache__/
 anomal_venv
 
 data/221108_nextgen/*
+
+*.avi
