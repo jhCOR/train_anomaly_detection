@@ -85,7 +85,7 @@ class Uility():
         data_list = data_list if ObjectHelper.isIterable(data_list) else [data_list]
         
         number_list = cls.extractSubString(data_list, "_", "int")
-
+        
         for i in range(int(number_list[-1])):
             if i+1 in number_list:
                 continue
@@ -93,17 +93,28 @@ class Uility():
                 number_list.append(i+1)
         number_list = sorted(number_list)
 
+        omitted_list = []
         for i in range(len(number_list)):
             find = False
             for index in range(len(data_list)):
-                target = '_{0:02d}'.format(number_list[i])
 
+                target = '_{0:02d}'.format(number_list[i])
                 if data_list[index].find(str(target)) > -1:
                     find = True
                     break
+
+                #tdms파일 명이 01이되기도 하고 1처엄 자릿수가 맞춰져있지 않아서 추가(23.08.16)
+                target = '_{0}'.format(number_list[i])
+                if data_list[index].find(str(target)) > -1:
+                    find = True
+                    break
+            
             if find is False:
-                print(number_list[i])
-        data_list.insert(number_list[i]-2, None)
+                print("there is missing: ", number_list[i])
+                omitted_list.append({"pos": number_list[i]-1})
+        # 바로 위에서 missing된 path의 position을 저장하여 마지막에 한꺼번에 none을 insert
+        for i in range(len(omitted_list)):
+            data_list.insert(omitted_list[i].get("pos"), None)
         return data_list
 
         

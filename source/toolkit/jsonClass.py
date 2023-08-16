@@ -10,7 +10,6 @@ class JsonClass(Uility):
         super().__init__()
         files = glob.glob(file_path)
         self.file_list = self.loadPath(files)
-        print(self)
 
     def loadPath(self, filepaths):
         sorted_list = self.sort_filenames_by_number(filepaths, criteria='Test_')

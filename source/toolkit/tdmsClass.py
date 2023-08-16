@@ -47,18 +47,19 @@ class TdmsClass(Uility):
             try:
                 lists.append( tdms[str(group)][str(channel)][:] )
             except Exception as e:
+                lists.append( [] )
                 print(error_count, " => ", e)
                 if error_count == 0:
-                    self.showChannelInfo(tdms)
+                    self.showGroupinfo(tdms)
                 error_count = error_count + 1
         return lists
 
     def showGroupinfo(self, tdms_file):
         group_list = tdms_file.groups()
-        print("Groups in TDMS:", group_list)
+        print("\n Groups in TDMS:", group_list)
         return group_list
 
     def showChannelInfo(self, tdms_file):
         group_list = tdms_file.groups()
         for group in group_list:
-            print("Channels in Group:", tdms_file[group.name].channels())
+            print("\n Channels in Group:", tdms_file[group.name].channels())

@@ -7,7 +7,7 @@ db_converter = torchaudio.transforms.AmplitudeToDB()
 
 class SoundClass(Uility):
     @classmethod
-    def getSound(cls, path):
+    def getSound(cls, path, suffix=".wav"):
         try:
             waveform, sample_rate = torchaudio.load(Path(path).with_suffix('.wav'))
             audio_sample = F.resample(waveform[0], sample_rate, 16000, lowpass_filter_width=6)
