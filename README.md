@@ -11,4 +11,4 @@
 
 ### S206(음향 센서) 데이터:
 [LPData]
-<img src="./source/result/221108_nextgen_LPData_values.png" width="500">
+<img src="./source/result/221108_nextgen_S206_LPData_values_with_json.png" width="500">
