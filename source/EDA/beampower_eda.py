@@ -42,12 +42,13 @@ def main(paths):
 
         title = "Num_" + str(i) + "_Horn " + str( json_value.get('Horn') ) + "_" + \
             str( json_value.get('Car_num') ) + "_" + str( json_value.get('Position') )
-        filename = "source/result/" + title + "_beampower.mp4"
+        filename = "source/result/" + title + "_beampower.avi"
 
         if isinstance(tdms_value, np.ndarray):
             if count == 0:
                 #save as video
-                videomanager.reshape(tdms_value, (-1, 40, 30)).saveVideo(filename=filename)
+                
+                videomanager.reshape(tdms_value, (-1, 30, 40)).saveVideo(filename=filename)
         count = count + 1
 
     print("done")

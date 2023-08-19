@@ -26,16 +26,18 @@ class VideoManager():
         self.data = frame_list
         self.step = "makeVideoData"
         return self
-
-    def saveVideo(self, filename="test.mp4", size=(40, 30)):
+    
+    def saveVideo(self, filename="test.avi", frames=10, size=(40, 30)):
 
         if (self.step == "makeVideoData") | (self.step == "reshape"):
-            fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-            videoobject = cv2.VideoWriter(filename, fourcc, 10, (self.size[1], self.size[0]), False)
-            # try:
-        
+            fourcc = cv2.VideoWriter_fourcc(*'DIVX')
+            videoobject = cv2.VideoWriter(filename, fourcc, frames, (self.size[0], self.size[1]), False)
+            
+            
             for frame in self.data:
-                videoobject.write(frame)
-            # except Exception as e:
-            #     print(e)
+                image = cv2.GaussianBlur(frame, (10, 10), 0)
+                _, thresholded_image = cv2.threshold(image, 40, 255, cv2.THRESH_BINARY_INV)
+                image_no_background = cv2.bitwise_and(frame, frame, mask=thresholded_image)
+                videoobject.write(image_no_background)
+
             videoobject.release()
