@@ -9,9 +9,9 @@ from nptdms import TdmsFile
 import math
 import copy
 import numpy as np
+import matplotlib.pyplot as plt
+from pathlib import Path
 
-# tdmsclass.getChannelData(tdms_datas, "Beampower", "Beampower") 이 코드 제외하고 
-# tdms_eda와 완전히 같은데 EDA다보니 편의상 분리하였습니다. 
 def main(paths):
     prefix = "./data/"
 
@@ -23,25 +23,18 @@ def main(paths):
     filled_list = Uility.fillingForNumeric( copy.copy(tdmsclass.file_list) ) #중간에 비어있거나 txt파일인 경우 None으로 채워넣기
     tdms_datas = tdmsclass.loadTdmsData( tdmsclass.file_list )
     tdms_datas = tdmsclass.getChannelData(tdms_datas, "Beampower", "Beampower")
-    
-    weight, height = tdmsclass.get_list_to_matrix_size(tdms_datas)
 
     jsonclass = JsonClass(json_filepath)
     json_datas = jsonclass.loadJsonData( jsonclass.file_list )
 
     videomanager = VideoManager(size=(40, 30))
 
-    col_count = 0
-    row_count = 0
+    count = 0
     for i in tqdm(range(len(filled_list))):
         if (filled_list[i] is None) | (tdms_datas[i] is None) | (json_datas[i] is None):
             tdms_datas.insert(i, None)
 
-            if col_count < weight:
-                col_count = col_count+1
-            if col_count == weight:
-                row_count = row_count+1
-                col_count = 0
+            count = count + 1
             continue
 
         tdms_value = tdms_datas[i]
@@ -49,19 +42,14 @@ def main(paths):
 
         title = "Num_" + str(i) + "_Horn " + str( json_value.get('Horn') ) + "_" + \
             str( json_value.get('Car_num') ) + "_" + str( json_value.get('Position') )
-        filename = "source/result/" + title + "_beampower.avi"
-        
-        if isinstance(tdms_value, np.ndarray):
-            #tdms_value = np.reshape(tdms_value, (-1, 40, 30))
-            if col_count == 1:
-                print( np.shape(tdms_value) )
-                videomanager.saveVideo(filename=filename)
+        filename = "source/result/" + title + "_beampower.mp4"
 
-        if col_count < weight:
-            col_count = col_count+1
-        if col_count == weight:
-            row_count = row_count+1
-            col_count = 0
+        if isinstance(tdms_value, np.ndarray):
+            if count == 0:
+                #save as video
+                videomanager.reshape(tdms_value, (-1, 40, 30)).saveVideo(filename=filename)
+        count = count + 1
+
     print("done")
 
 if __name__ == '__main__':

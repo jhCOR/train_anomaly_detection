@@ -10,7 +10,7 @@ class VideoManager():
 
     def reshape(self, content, size):
         content = np.reshape(content, size)
-        content = content.astype(np.uint8)
+        content = cv2.normalize(content, None, 255, 0, cv2.NORM_MINMAX, cv2.CV_8U)
         self.data = content
         self.step = "reshape"
         return self
@@ -27,13 +27,15 @@ class VideoManager():
         self.step = "makeVideoData"
         return self
 
-    def saveVideo(self, filename="test.avi", size=(40, 30)):
-        fourcc = cv2.VideoWriter_fourcc(*'XVID')
-        videoobject = cv2.VideoWriter(filename, fourcc, 10, self.size)
-        # try:
-        if self.step == "makeVideoData":
+    def saveVideo(self, filename="test.mp4", size=(40, 30)):
+
+        if (self.step == "makeVideoData") | (self.step == "reshape"):
+            fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+            videoobject = cv2.VideoWriter(filename, fourcc, 10, (self.size[1], self.size[0]), False)
+            # try:
+        
             for frame in self.data:
                 videoobject.write(frame)
-        # except Exception as e:
-        #     print(e)
-        videoobject.release()
+            # except Exception as e:
+            #     print(e)
+            videoobject.release()

@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 from .objectHelper import ObjectHelper
 import numpy as np
+import librosa
 
 class PlotManager():
     def __init__(self, row=1, col=1, size=[7,3], type="melspectrogram"):
@@ -57,3 +58,10 @@ class PlotManager():
         axis.set_ylabel(ylabel)
         axis.set_xlabel("time")
         im = axis.plot(content)
+
+    def draw_2D(self, axis, content, title=None, ylabel="-", xlabel="-",):
+        axis.set_title(title)
+        axis.set_ylabel(ylabel)
+        axis.set_xlabel(xlabel)
+        im = axis.imshow(content)
+        self.figure.colorbar(im, ax=axis)
