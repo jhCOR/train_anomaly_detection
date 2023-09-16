@@ -64,17 +64,15 @@ def EDA_tdms(paths):
         tdms_value = tdms_datas[i]
         json_value = json_datas[i]
 
-        title = "Num: " + str(i) + "-> Horn " + str( json_value.get('Horn') ) + "_" + \
+        title = "Num_" + str(i) + "_Horn_" + str( json_value.get('Horn') ) + "_" + \
             str( json_value.get('Car_num') ) + "_" + str( json_value.get('Position') )
         row = {"content": tdms_value, "position": [col_count, row_count], "title":title}
         plot_rawaudio_list.append( row )
 
         if len(tdms_value)>1:
             try:
-                print(torch.Tensor(tdms_value).shape)
                 tensor_data = torch.Tensor(tdms_value).unsqueeze(0)
                 path = f"source/result/wav/{filename}_{title}.wav"
-                print("=>", path, tensor_data, sampling_rate)
                 torchaudio.save(path, tensor_data, sampling_rate)
                 #inspect_file(path)
             except Exception as e:
