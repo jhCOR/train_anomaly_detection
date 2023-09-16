@@ -4,11 +4,26 @@ from ..toolkit.jsonClass import JsonClass
 from ..toolkit.utils import Uility
 
 from tqdm import tqdm
-from nptdms import TdmsFile
+import numpy as np
+import wave, math
 import math
 import copy
+import tempfile
+import torchaudio
+import os
+import torch 
 
-def main(paths):
+sampling_rate = 22050
+
+def inspect_file(path):
+    print("-" * 10)
+    print("Source:", path)
+    print("-" * 10)
+    print(f" - File size: {os.path.getsize(path)} bytes")
+    print(f" - {torchaudio.info(path)}")
+    print()
+
+def EDA_tdms(paths):
     
     prefix = "./data/"
     filepath, json_filepath, filename = paths
@@ -29,6 +44,8 @@ def main(paths):
 
     plotmanager = PlotManager(row=weight, col=height, type='plot_numpy')
     plot_rawaudio_list = []
+
+    print(os.path.realpath(__file__))
 
     col_count = 0
     row_count = 0
@@ -52,6 +69,17 @@ def main(paths):
         row = {"content": tdms_value, "position": [col_count, row_count], "title":title}
         plot_rawaudio_list.append( row )
 
+        if len(tdms_value)>1:
+            try:
+                print(torch.Tensor(tdms_value).shape)
+                tensor_data = torch.Tensor(tdms_value).unsqueeze(0)
+                path = f"source/result/wav/{filename}_{title}.wav"
+                print("=>", path, tensor_data, sampling_rate)
+                torchaudio.save(path, tensor_data, sampling_rate)
+                #inspect_file(path)
+            except Exception as e:
+                print("error:", e)
+
         if col_count < weight:
             col_count = col_count+1
         if col_count == weight:
@@ -68,6 +96,6 @@ if __name__ == '__main__':
     #property_list = [{"group": "LPData", "channel": "Channel"}]
     for path in zip(path_list, json_path, name_list):
         print(path)
-        main(path)
+        EDA_tdms(path)
 
 #파일 실행 명령: python -m source.EDA.tdmsfile_eda
