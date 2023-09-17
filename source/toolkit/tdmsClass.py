@@ -21,17 +21,18 @@ class TdmsObjectClass():
 
 
 class TdmsClass(Uility):
-    def __init__(self, file_path):
+    def __init__(self, file_path, exclude=None):
         super().__init__()
         files = glob.glob(file_path)
-        self.file_list = self.loadPath(files)
+        files = [file for file in files if str(exclude) not in file]
+        self.file_list = self.loadPath(files, criteria='test_', sub_criteria="_")
 
-    def loadPath(self, filepaths):
-        sorted_list = self.sort_filenames_by_number(filepaths, criteria='test_')
+    def loadPath(self, filepaths, criteria='test_', sub_criteria=None):
+        sorted_list = self.sort_filenames_by_number(filepaths, criteria=criteria, sub_criteria=sub_criteria)
         return sorted_list
 
     def loadTdmsData(self, filepaths):
-        print("--load tdms data--")
+        print("--load tdms data--", "count: ", len(filepaths))
         tdms_list = []
         for path in tqdm(filepaths):
             tdms_list.append( TdmsFile(path) )

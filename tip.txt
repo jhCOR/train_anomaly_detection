@@ -1,0 +1,9 @@
+nohup python -u main.py
+tail -f nohup.out
+
+watch -d -n 1 nvidia-smi
+ps -ef | grep main.py
+
+du -hsx * | sort -rh | head -n 10
+
+

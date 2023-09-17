@@ -49,13 +49,15 @@ class Uility():
         part = r'_random_(\d{1,2})'
         target = re.sub('_random_', self.criteria, part)
         match = re.search(target, filename)
-
+        
         if match:
             return int(match.group()[len(self.criteria):])
-        else: 
+        elif self.sub_criteria is not None: 
             target = re.sub('_random_', self.sub_criteria, part)
             match = re.search(target, filename)
             return int(match.group()[len(self.sub_criteria):])
+        else:
+            return -1
 
     def sort_filenames_by_number(self, filenames, criteria="_out_", sub_criteria="_"):
         self.criteria = criteria

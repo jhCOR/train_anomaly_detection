@@ -45,10 +45,11 @@ def EDA_tdms(paths):
     plotmanager = PlotManager(row=weight, col=height, type='plot_numpy')
     plot_rawaudio_list = []
 
-    print(os.path.realpath(__file__))
-
     col_count = 0
     row_count = 0
+
+    print(len(filled_list))
+
     for i in tqdm(range(len(filled_list))):
         if (filled_list[i] is None) | (tdms_datas[i] is None) | (json_datas[i] is None):
             plot_rawaudio_list.append( None )
@@ -69,14 +70,14 @@ def EDA_tdms(paths):
         row = {"content": tdms_value, "position": [col_count, row_count], "title":title}
         plot_rawaudio_list.append( row )
 
-        if len(tdms_value)>1:
-            try:
-                tensor_data = torch.Tensor(tdms_value).unsqueeze(0)
-                path = f"source/result/wav/{filename}_{title}.wav"
-                torchaudio.save(path, tensor_data, sampling_rate)
-                #inspect_file(path)
-            except Exception as e:
-                print("error:", e)
+        # if len(tdms_value)>1:
+        #     try:
+        #         tensor_data = torch.Tensor(tdms_value).unsqueeze(0)
+        #         path = f"source/result/wav/{filename}_{title}.wav"
+        #         torchaudio.save(path, tensor_data, sampling_rate)
+        #         #inspect_file(path)
+        #     except Exception as e:
+        #         print("error:", e)
 
         if col_count < weight:
             col_count = col_count+1
@@ -87,13 +88,21 @@ def EDA_tdms(paths):
     plotmanager.drawPlot(plot_rawaudio_list, save_as_file=filename)
     print("done")
 
+
+path_list =  ["221102_hydrogen", "221103_nextgen", "221104_nextgen", "221107_nextgen",
+               "221108_nextgen", "221109_hydrogen", "221110_nextgen"]
+json_path = ["221102_수소열차", "221103_차세대전동차", "221104_차세대전동차", "221107_차세대전동차",
+              "221108_차세대전동차", "221109_수소열차", "221110_차세대전동차"]
+
 if __name__ == '__main__':
-    path_list = ["221108_nextgen/S206/*.tdms", "221109_hydrogen/S206/*.tdms"]
-    json_path = ["train_json/221108_차세대전동차/*.json", "train_json/221109_수소열차/*.json"]
-    name_list = ["221108_nextgen_S206", "221109_hydrogen_S206"]
+    full_path_list = [str(i) + "/S206/*.tdms" for i in path_list]
+    full_json_path = ["train_json/" + str(j) + "/*.json" for j in json_path]
+    full_name_list = [str(i) + "_S206" for i in path_list]
     #property_list = [{"group": "LPData", "channel": "Channel"}]
-    for path in zip(path_list, json_path, name_list):
-        print(path)
+    count = 0
+    for path in zip(full_path_list, full_json_path, full_name_list):
+        print(count, "번째 -> ", path)
         EDA_tdms(path)
+        count = count + 1
 
 #파일 실행 명령: python -m source.EDA.tdmsfile_eda
