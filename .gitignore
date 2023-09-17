@@ -4,5 +4,6 @@ anomal_venv
 
 data/*
 *.avi
-
+*.wav
 *.tdms
+*.zip

@@ -12,6 +12,7 @@ import tempfile
 import torchaudio
 import os
 import torch 
+import pandas as pd
 
 sampling_rate = 22050
 
@@ -23,7 +24,23 @@ def inspect_file(path):
     print(f" - {torchaudio.info(path)}")
     print()
 
-def EDA_tdms(paths):
+def extractData(df, json_data):
+    title=json_data.get('title_s206')
+    Horn = json_data.get('Horn')
+    Position = json_data.get('Position')
+
+    S206_position = json_data.get('S206_position')
+
+    Car_type = json_data.get('Train')
+    Length = json_data.get('Length')
+    Car_num = json_data.get('Car_num')
+    df2 = pd.DataFrame.from_dict([{'title': title, 'Horn' : Horn, 'Position' : Position, 'S206_position' : S206_position,
+                        'Car_type':Car_type, 'Length':Length,  'Car_num':Car_num}])
+    new_df = pd.concat([df,df2])
+
+    return new_df
+
+def EDA_tdms(paths, meta_dataframe):
     
     prefix = "./data/"
     filepath, json_filepath, filename = paths
@@ -49,7 +66,7 @@ def EDA_tdms(paths):
     row_count = 0
 
     print(len(filled_list))
-
+    
     for i in tqdm(range(len(filled_list))):
         if (filled_list[i] is None) | (tdms_datas[i] is None) | (json_datas[i] is None):
             plot_rawaudio_list.append( None )
@@ -69,7 +86,8 @@ def EDA_tdms(paths):
             str( json_value.get('Car_num') ) + "_" + str( json_value.get('Position') )
         row = {"content": tdms_value, "position": [col_count, row_count], "title":title}
         plot_rawaudio_list.append( row )
-
+        meta_dataframe = extractData(meta_dataframe, json_value)
+        
         # if len(tdms_value)>1:
         #     try:
         #         tensor_data = torch.Tensor(tdms_value).unsqueeze(0)
@@ -86,7 +104,9 @@ def EDA_tdms(paths):
             col_count = 0
     filename = "source/result/" + filename +"_LPData_values_with_json.png"
     plotmanager.drawPlot(plot_rawaudio_list, save_as_file=filename)
+    
     print("done")
+    return meta_dataframe
 
 
 path_list =  ["221102_hydrogen", "221103_nextgen", "221104_nextgen", "221107_nextgen",
@@ -99,10 +119,13 @@ if __name__ == '__main__':
     full_json_path = ["train_json/" + str(j) + "/*.json" for j in json_path]
     full_name_list = [str(i) + "_S206" for i in path_list]
     #property_list = [{"group": "LPData", "channel": "Channel"}]
+
+    dataframe = pd.DataFrame(columns=['Horn','Position', 'S206_position',
+                        'Car_type', 'Length',  'Car_num'])
     count = 0
     for path in zip(full_path_list, full_json_path, full_name_list):
         print(count, "번째 -> ", path)
-        EDA_tdms(path)
+        dataframe = EDA_tdms(path, dataframe)
         count = count + 1
-
+    dataframe.to_csv("source/result/metadata.csv")
 #파일 실행 명령: python -m source.EDA.tdmsfile_eda
