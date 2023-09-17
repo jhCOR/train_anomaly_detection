@@ -24,7 +24,7 @@ def inspect_file(path):
     print(f" - {torchaudio.info(path)}")
     print()
 
-def extractData(df, json_data):
+def extractData(df, json_data, path):
     title=json_data.get('title_s206')
     Horn = json_data.get('Horn')
     Position = json_data.get('Position')
@@ -34,8 +34,9 @@ def extractData(df, json_data):
     Car_type = json_data.get('Train')
     Length = json_data.get('Length')
     Car_num = json_data.get('Car_num')
-    df2 = pd.DataFrame.from_dict([{'title': title, 'Horn' : Horn, 'Position' : Position, 'S206_position' : S206_position,
-                        'Car_type':Car_type, 'Length':Length,  'Car_num':Car_num}])
+    df2 = pd.DataFrame.from_dict([{'title': title, 'Horn' : Horn, 'Position' : Position, 
+                                   'S206_position' : S206_position,'Car_type':Car_type, 
+                                   'Length':Length,  'Car_num':Car_num, 'path': path}])
     new_df = pd.concat([df,df2])
 
     return new_df
@@ -86,7 +87,9 @@ def EDA_tdms(paths, meta_dataframe):
             str( json_value.get('Car_num') ) + "_" + str( json_value.get('Position') )
         row = {"content": tdms_value, "position": [col_count, row_count], "title":title}
         plot_rawaudio_list.append( row )
-        meta_dataframe = extractData(meta_dataframe, json_value)
+
+        path = f"{filename}_{title}.wav"
+        meta_dataframe = extractData(meta_dataframe, json_value, path)
         
         # if len(tdms_value)>1:
         #     try:
