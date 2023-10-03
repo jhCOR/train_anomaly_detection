@@ -91,12 +91,13 @@ def EDA_tdms(paths, meta_dataframe):
 
         path = f"{filename}_{title}.wav"
         
-        sampling = list(tdms_value[::int(25600/2)])
+        sampling_rate = 5
+        sampling = list(tdms_value[::int(25600/5)])
         start = sampling.index(1.0) if 1.0 in sampling else -1
         sampling.reverse()
         end = sampling.index(1.0) if 1.0 in sampling else -1
         end_point = int( len(sampling) - end )
-        meta_dataframe = extractData(meta_dataframe, json_value, path, start, end_point)
+        meta_dataframe = extractData(meta_dataframe, json_value, path, float(start/5), float(end_point/5))
 
         # if len(tdms_value)>1:
         #     try:
