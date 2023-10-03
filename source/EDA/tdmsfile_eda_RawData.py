@@ -24,7 +24,7 @@ def inspect_file(path):
     print(f" - {torchaudio.info(path)}")
     print()
 
-def extractData(df, json_data, path):
+def extractData(df, json_data, path, start, end):
     title=json_data.get('title_s206')
     Horn = json_data.get('Horn')
     Position = json_data.get('Position')
@@ -36,7 +36,8 @@ def extractData(df, json_data, path):
     Car_num = json_data.get('Car_num')
     df2 = pd.DataFrame.from_dict([{'title': title, 'Horn' : Horn, 'Position' : Position, 
                                    'S206_position' : S206_position,'Car_type':Car_type, 
-                                   'Length':Length,  'Car_num':Car_num, 'path': path}])
+                                   'Length':Length,  'Car_num':Car_num, 'path': path, 
+                                   "channel97_start":start, "channel97_end":end}])
     new_df = pd.concat([df,df2])
 
     return new_df
@@ -53,7 +54,7 @@ def EDA_tdms(paths, meta_dataframe):
     tdmsclass = TdmsClass(filepath)
     filled_list = Uility.fillingForNumeric( copy.copy(tdmsclass.file_list) ) #중간에 비어있거나 txt파일인 경우 None으로 채워넣기
     tdms_datas = tdmsclass.loadTdmsData( tdmsclass.file_list )
-    tdms_datas = tdmsclass.getChannelData(tdms_datas, "LPData", "Channel")
+    tdms_datas = tdmsclass.getChannelData(tdms_datas, "RawData", "Channel97")
     
     weight, height = tdmsclass.get_list_to_matrix_size(tdms_datas)
 
@@ -67,7 +68,6 @@ def EDA_tdms(paths, meta_dataframe):
     row_count = 0
 
     print(len(filled_list))
-    
     for i in tqdm(range(len(filled_list))):
         if (filled_list[i] is None) | (tdms_datas[i] is None) | (json_datas[i] is None):
             plot_rawaudio_list.append( None )
@@ -85,12 +85,19 @@ def EDA_tdms(paths, meta_dataframe):
 
         title = "Num_" + str(i) + "_Horn_" + str( json_value.get('Horn') ) + "_" + \
             str( json_value.get('Car_num') ) + "_" + str( json_value.get('Position') )
-        row = {"content": tdms_value, "position": [col_count, row_count], "title":title}
+        row = {"content": tdms_value[::25600], "position": [col_count, row_count], "title":title}
+
         plot_rawaudio_list.append( row )
 
         path = f"{filename}_{title}.wav"
-        meta_dataframe = extractData(meta_dataframe, json_value, path)
         
+        sampling = list(tdms_value[::int(25600/2)])
+        start = sampling.index(1.0) if 1.0 in sampling else -1
+        sampling.reverse()
+        end = sampling.index(1.0) if 1.0 in sampling else -1
+        end_point = int( len(sampling) - end )
+        meta_dataframe = extractData(meta_dataframe, json_value, path, start, end_point)
+
         # if len(tdms_value)>1:
         #     try:
         #         tensor_data = torch.Tensor(tdms_value).unsqueeze(0)
@@ -105,7 +112,8 @@ def EDA_tdms(paths, meta_dataframe):
         if col_count == weight:
             row_count = row_count+1
             col_count = 0
-    filename = "source/result/" + filename +"_LPData_values_with_json.png"
+    filename = "source/result/" + filename +"_RawData_values_with_json.png"
+
     plotmanager.drawPlot(plot_rawaudio_list, save_as_file=filename)
     
     print("done")
@@ -131,4 +139,4 @@ if __name__ == '__main__':
         dataframe = EDA_tdms(path, dataframe)
         count = count + 1
     dataframe.to_csv("source/result/metadata.csv")
-#파일 실행 명령: python -m source.EDA.tdmsfile_eda
+#파일 실행 명령: python -m source.EDA.tdmsfile_eda_RawData
