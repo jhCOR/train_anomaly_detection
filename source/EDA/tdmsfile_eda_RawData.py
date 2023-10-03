@@ -24,7 +24,7 @@ def inspect_file(path):
     print(f" - {torchaudio.info(path)}")
     print()
 
-def extractData(df, json_data, path, start, end):
+def extractData(df, json_data, path, start, end, peak_point):
     title=json_data.get('title_s206')
     Horn = json_data.get('Horn')
     Position = json_data.get('Position')
@@ -37,7 +37,8 @@ def extractData(df, json_data, path, start, end):
     df2 = pd.DataFrame.from_dict([{'title': title, 'Horn' : Horn, 'Position' : Position, 
                                    'S206_position' : S206_position,'Car_type':Car_type, 
                                    'Length':Length,  'Car_num':Car_num, 'path': path, 
-                                   "channel97_start":start, "channel97_end":end}])
+                                   "channel97_start":start, "channel97_end":end,
+                                   "peak": peak_point}])
     new_df = pd.concat([df,df2])
 
     return new_df
@@ -55,7 +56,9 @@ def EDA_tdms(paths, meta_dataframe):
     filled_list = Uility.fillingForNumeric( copy.copy(tdmsclass.file_list) ) #중간에 비어있거나 txt파일인 경우 None으로 채워넣기
     tdms_datas = tdmsclass.loadTdmsData( tdmsclass.file_list )
     tdms_datas = tdmsclass.getChannelData(tdms_datas, "RawData", "Channel97")
-    
+    tdms_datas_2 = tdmsclass.loadTdmsData( tdmsclass.file_list )
+    tdms_datas_2 = tdmsclass.getChannelData(tdms_datas_2, "LPData", "Channel")
+
     weight, height = tdmsclass.get_list_to_matrix_size(tdms_datas)
 
     jsonclass = JsonClass(json_filepath)
@@ -69,9 +72,10 @@ def EDA_tdms(paths, meta_dataframe):
 
     print(len(filled_list))
     for i in tqdm(range(len(filled_list))):
-        if (filled_list[i] is None) | (tdms_datas[i] is None) | (json_datas[i] is None):
+        if (filled_list[i] is None) | (tdms_datas[i] is None) | (json_datas[i] is None) | (tdms_datas_2[i] is None):
             plot_rawaudio_list.append( None )
             tdms_datas.insert(i, None)
+            tdms_datas_2.insert(i, None)
 
             if col_count < weight:
                 col_count = col_count+1
@@ -81,6 +85,7 @@ def EDA_tdms(paths, meta_dataframe):
             continue
 
         tdms_value = tdms_datas[i]
+        tdms_value_2 = tdms_datas_2[i]
         json_value = json_datas[i]
 
         title = "Num_" + str(i) + "_Horn_" + str( json_value.get('Horn') ) + "_" + \
@@ -93,11 +98,12 @@ def EDA_tdms(paths, meta_dataframe):
         
         sampling_rate = 5
         sampling = list(tdms_value[::int(25600/5)])
+        peak = float( np.argmax(tdms_value_2) / 25600) if len(tdms_value_2)>0 else -1
         start = sampling.index(1.0) if 1.0 in sampling else -1
         sampling.reverse()
         end = sampling.index(1.0) if 1.0 in sampling else -1
         end_point = int( len(sampling) - end )
-        meta_dataframe = extractData(meta_dataframe, json_value, path, float(start/5), float(end_point/5))
+        meta_dataframe = extractData(meta_dataframe, json_value, path, float(start/5), float(end_point/5), peak)
 
         # if len(tdms_value)>1:
         #     try:
