@@ -6,4 +6,6 @@ ps -ef | grep main.py
 
 du -hsx * | sort -rh | head -n 10
 
+python -m source.EDA.tdmsfile_eda
+python -m source.EDA.tdmsfile_eda_RawData
 

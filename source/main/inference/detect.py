@@ -3,6 +3,10 @@ import torchaudio.functional as F
 import torch
 from torchvision.models import resnet18
 import torch.nn as nn
+import joblib
+import copy
+from source.toolkit.tdmsClass import TdmsClass
+from source.toolkit.utils import Uility
 
 def number_of_correct(pred, target):
     # count number of correct predictions
@@ -33,7 +37,7 @@ def inference(audio_sample, model_path, device):
     feature = db_converter(mel_converter(audio_sample))
 
     model = prepare_model()
-    model.load_state_dict(torch.load(model_path))
+    model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
     model.to(device)
     model.eval()
 
@@ -43,13 +47,33 @@ def inference(audio_sample, model_path, device):
     output = model(expanded_data)
     pred = get_likely_index(output)
 
+    print( output )
     print( "이상치 감지" if int(pred[0]) == 1 else "이상치 불검출")
     
+    #regressor = joblib.load('linear_regression.pkl')
+    #prediction = regressor.predict(X_test)
+
+def extractSoundAndDataFromTDMS(tdms_path):
+    
+    tdmsclass = TdmsClass(tdms_path)
+
+    tdms_datas_lp = tdmsclass.loadTdmsData( tdmsclass.file_list )
+    tdms_datas_lp = tdmsclass.getChannelData(tdms_datas_lp, "LPData", "Channel")
+
+    tdms_datas_raw = tdmsclass.loadTdmsData( tdmsclass.file_list )
+    tdms_datas_raw = tdmsclass.getChannelData(tdms_datas_raw, "RawData", "Channel97")
+
+
 def main():
-    waveform, sample_rate = torchaudio.load( )
+    filePath = "221109_hydrogen/S206/test_2.tdms"
+    extractSoundAndDataFromTDMS(filePath)
+    
+    waveform, sample_rate = torchaudio.load( "source/result/sample_sound/noisy_audio.wav")
     audio_sample = F.resample(waveform[0], sample_rate, 25600, lowpass_filter_width=6)
-    modelPath = "train_anomaly_detection\source\main\inference\trained_model\best_model.pt"
-    inference(audio_sample, modelPath, "cuda")
+    modelPath = "source/result/trained_model/best_model.pt"
+    inference(audio_sample, modelPath, "cpu")
 
 if __name__ == '__main__':
     main()
+
+# python -m source.main.inference.detect
