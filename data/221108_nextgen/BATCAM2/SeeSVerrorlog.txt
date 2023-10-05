@@ -1,0 +1,5 @@
+2022-11-08 13:53:49	Warning	537650	NI STM.lvlib:Read Message (TCP).vi:6180001->HostMain_v8_disemble.vi
+
+2022-11-08 13:58:38	Error	-1931	SVFA Power Spectrum (1 Ch).vi:7340001
+2022-11-08 14:54:06	Warning	537650	NI STM.lvlib:Read Message (TCP).vi:6180001->HostMain_v8_disemble.vi
+

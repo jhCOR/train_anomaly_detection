@@ -2,8 +2,7 @@ __pycache__/
 
 anomal_venv
 
-data/*
 *.avi
-
+source/result/wav/*
 *.tdms
 *.zip
