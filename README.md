@@ -11,7 +11,7 @@
 
 ### S206(음향 센서) 데이터:
 [LPData]
-<img src="./source/result/221108_nextgen_S206_LPData_values_with_json.png" width="500">
+<img src="./source/result/221102_hydrogen_S206_RawData_values_with_json.png" width="500">
 
 [Beampower]
-<img src="./source/result/221108_nextgen_S206_Beampower_values_with_json.png" width="500">
+<img src="./source/result/221109_hydrogen_S206_RawData_values_with_json.png" width="500">
