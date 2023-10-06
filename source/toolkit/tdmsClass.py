@@ -24,6 +24,7 @@ class TdmsClass(Uility):
     def __init__(self, file_path, exclude=None):
         super().__init__()
         files = glob.glob(file_path)
+
         files = [file for file in files if str(exclude) not in file]
         self.file_list = self.loadPath(files, criteria='test_', sub_criteria="_")
 

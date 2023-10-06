@@ -7,6 +7,9 @@ import joblib
 import copy
 from source.toolkit.tdmsClass import TdmsClass
 from source.toolkit.utils import Uility
+import pandas as pd
+import numpy as np
+import argparse
 
 def number_of_correct(pred, target):
     # count number of correct predictions
@@ -29,7 +32,8 @@ def prepare_model():
 
     return resnet_model
 
-def inference(audio_sample, model_path, device):
+def predict_anomaly(audio_sample, model_path, device):
+    print("start inference")
     #yes가 1임
     mel_converter = torchaudio.transforms.MelSpectrogram(sample_rate=25600, n_mels=80)
     db_converter = torchaudio.transforms.AmplitudeToDB()
@@ -49,31 +53,81 @@ def inference(audio_sample, model_path, device):
 
     print( output )
     print( "이상치 감지" if int(pred[0]) == 1 else "이상치 불검출")
-    
-    #regressor = joblib.load('linear_regression.pkl')
-    #prediction = regressor.predict(X_test)
+
+def predict_location(peak, average_velocity):
+    data = pd.DataFrame({"peak": [peak], "average_velocity(km)":[average_velocity]})
+    regressor = joblib.load("source/result/trained_model/linear_regression.pkl")
+    prediction = regressor.predict(data)
+    print( "위치 추정: ", str(prediction[0]) + "m" )
+
+def saveToWav(tdms_value):
+    if len(tdms_value)>0:
+        print("save to wav file")
+        try:
+            tensor_data = torch.Tensor(tdms_value).unsqueeze(0)
+            path = f"source/result/sample_sound/generated_noisy_sound.wav"
+            torchaudio.save(path, tensor_data, 25600)
+
+        except Exception as e:
+            print("error:", e)
+        print("successfully save tdms(LPData) to wav.")
+    else:
+        print("too short tdms file")
 
 def extractSoundAndDataFromTDMS(tdms_path):
+    print("extract data from tdms file")
+    try:
+        
+        tdmsclass = TdmsClass(tdms_path)
+        
+        tdms_datas_lp = tdmsclass.loadTdmsData( tdmsclass.file_list )
+        tdms_datas_lp = tdmsclass.getChannelData(tdms_datas_lp, "LPData", "Channel")
+        tdms_datas_lp = tdms_datas_lp[0]
+        saveToWav(tdms_datas_lp)
+
+        tdms_datas_raw = tdmsclass.loadTdmsData( tdmsclass.file_list )
+        tdms_datas_raw = tdmsclass.getChannelData(tdms_datas_raw, "RawData", "Channel97")
+        tdms_datas_raw = tdms_datas_raw[0]
+        return tdms_datas_lp, tdms_datas_raw
     
-    tdmsclass = TdmsClass(tdms_path)
+    except Exception as e:
+        print("Error occured from extractSoundAndDataFromTDMS: ", e)
+        return None
 
-    tdms_datas_lp = tdmsclass.loadTdmsData( tdmsclass.file_list )
-    tdms_datas_lp = tdmsclass.getChannelData(tdms_datas_lp, "LPData", "Channel")
+def extractInformationFromTDFS(RawData, LPData):
+    sampling = list(RawData[::int(25600/5)])
+    peak = float( np.argmax(LPData) / 25600) if len(LPData)>0 else -1
+    start = sampling.index(1.0) if 1.0 in sampling else -1
+    sampling.reverse()
+    end = sampling.index(1.0) if 1.0 in sampling else -1
+    end_point = int( len(sampling) - end )
+    return  float(start/5), float(end_point/5), peak
 
-    tdms_datas_raw = tdmsclass.loadTdmsData( tdmsclass.file_list )
-    tdms_datas_raw = tdmsclass.getChannelData(tdms_datas_raw, "RawData", "Channel97")
+def calculateAverageVelocity(train_length, start, end):
+    average_velocity = ( train_length * 0.001)  / ( ( end - start ) / 3600)
+    return average_velocity
+train_dict = {"hydrogen": 44, "newgen": 122}
 
+def main(train_type):
+    train_length = train_dict.get(train_type)
+    filePath = "./data/221109_hydrogen/S206/test_2.tdms"
+    LPData_tdms, RawData_tdms = extractSoundAndDataFromTDMS(filePath)
+    if (RawData_tdms is None) | (LPData_tdms is None):
+        print("something is wrong with extractSoundAndDataFromTDMS")
 
-def main():
-    filePath = "221109_hydrogen/S206/test_2.tdms"
-    extractSoundAndDataFromTDMS(filePath)
-    
-    waveform, sample_rate = torchaudio.load( "source/result/sample_sound/noisy_audio.wav")
+    start_sec, end_sec, peak_sec = extractInformationFromTDFS(RawData_tdms, LPData_tdms)
+    velocity = calculateAverageVelocity(train_length, start_sec, end_sec)
+    waveform, sample_rate = torchaudio.load( "source/result/sample_sound/generated_noisy_sound.wav")
     audio_sample = F.resample(waveform[0], sample_rate, 25600, lowpass_filter_width=6)
     modelPath = "source/result/trained_model/best_model.pt"
-    inference(audio_sample, modelPath, "cpu")
+    predict_anomaly(audio_sample, modelPath, "cpu")
+    predict_location(peak_sec,velocity)
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(description='train anomaly detection')
+    parser.add_argument('--traintype', type=str, default='hydrogen', choices=['hydrogen', 'newgen'])
+
+    args = parser.parse_args()
+    main(args.traintype)
 
 # python -m source.main.inference.detect
