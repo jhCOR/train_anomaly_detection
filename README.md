@@ -21,9 +21,10 @@
 
 ### 설치 및 실행
 ```bash
-$ git clone git https://github.com/osamhack2021/Web_DigitalOfPages_kukgicjobs.git
-cd Web_DigitalOfPages_kukgicjobs
-$ npm install
+$ git clone https://github.com/IIP-LAB-TEAM/train_anomaly_detection.git
+python -m venv .venv
+pip install -r requirements.txt
+python -m source.main.inference.detect
 ```
 ### 팀 소개
 <table>
@@ -42,19 +43,29 @@ $ npm install
     <tr>
         <td align="center">
            <table>
-  <td>
-   <div align="center">정지혁
-  </td>
-  <td>
-    <img src="https://img.shields.io/badge/Github-jhCOR-black"/>
-  </td>
-   <td>
-     <img src="https://img.shields.io/badge/Gmail-ji9759@u.sogang.ac.kr-blue"/>
-  </td>
-</table>
+              <td>
+               <div align="center">정지혁
+              </td>
+              <td>
+                <img src="https://img.shields.io/badge/Github-jhCOR-black"/>
+              </td>
+               <td>
+                 <img src="https://img.shields.io/badge/Gmail-ji9759@u.sogang.ac.kr-blue"/>
+              </td>
+            </table>
         </td>
         <td align="center">
-           고재현
+           <table>
+              <td>
+               <div align="center">고재현
+              </td>
+              <td>
+                <img src="https://img.shields.io/badge/Github-@@-black"/>
+              </td>
+               <td>
+                 <img src="https://img.shields.io/badge/Gmail-@@-blue"/>
+              </td>
+            </table>
         </td>
     </tr>
 </table>
