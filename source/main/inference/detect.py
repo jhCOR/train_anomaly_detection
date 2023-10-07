@@ -28,13 +28,9 @@ def restrict_seed(seed):
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
 
-def predict_anomaly(audio_sample, model_path, device):
+def predict_anomaly(feature, model_path, device):
     print("start inference")
     #yes가 1임
-    mel_converter = torchaudio.transforms.MelSpectrogram(sample_rate=25600, n_mels=80)
-    db_converter = torchaudio.transforms.AmplitudeToDB()
-
-    feature = db_converter(mel_converter(audio_sample))
 
     model = prepare_model()
     model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
@@ -77,11 +73,16 @@ def main(train_type):
 
     plot(audio_sample, audio_noisy_sample)
 
-    isHorn = predict_anomaly(audio_noisy_sample, config_dict['detector_path'], "cpu")
+    mel_converter = torchaudio.transforms.MelSpectrogram(sample_rate=25600, n_mels=80)
+    db_converter = torchaudio.transforms.AmplitudeToDB()
+
+    feature = db_converter(mel_converter(audio_sample))
+
+    isHorn = predict_anomaly(feature, config_dict['detector_path'], "cpu")
 
     if isHorn is True:
         # 위치 추정을 위해 horn의 peak시간과 열차가 감지된 시간을 체크합니다. (channel 97트리거 이용)
-        start_sec, end_sec, peak_sec = extractInformationFromNumpy(RawData_tdms, audio_noisy_sample)
+        start_sec, end_sec, peak_sec = extractInformationFromNumpy(RawData_tdms, feature)
         velocity = calculateAverageVelocity(train_length, start_sec, end_sec)
 
         # 열차의 평균속도와 peak데이터를 이용하여 선형회귀 추정을 합니다. 
