@@ -23,6 +23,7 @@
 ```bash
 $ git clone https://github.com/IIP-LAB-TEAM/train_anomaly_detection.git
 python -m venv .venv
+[linux] python .venv/bin/activate
 pip install -r requirements.txt
 python -m source.main.inference.detect
 ```
