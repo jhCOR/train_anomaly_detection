@@ -29,13 +29,13 @@ def calculatePeakPoint(total_time, waveform, criteria="mean"):
         return median_peak
 
 
-def plot(original, new):
+def plot(original, new, path=["source/main/inference/plot_clean.png", "source/main/inference/plot_noisy.png"]):
     print("원본 데이터와 음원 병합 데이터를 plot중입니다. ")
     plt.clf()
     plt.plot(original[::3])
-    plt.savefig("source/main/inference/plot_clean.png")
+    plt.savefig(path[0])
 
     plt.clf()
     plt.plot(new[::3])
-    plt.savefig("source/main/inference/plot_noisy.png")
+    plt.savefig(path[1])
     print("plot 완료(저장위치: source/main/inference/ )")

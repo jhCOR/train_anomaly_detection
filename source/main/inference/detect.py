@@ -7,10 +7,11 @@ import random
 import joblib
 import torch
 
+from .predict import *
 from .calculation import *
-from .model import prepare_model
 from .sound import *
 from .extractData import *
+from .sound_spearation import sound_separation
 
 train_dict = {"hydrogen": 44, "newgen": 122}
 config_dict = {"detector_path": "source/result/trained_model/best_model.pt",
@@ -28,33 +29,7 @@ def restrict_seed(seed):
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
 
-def predict_anomaly(feature, model_path, device):
-    print("start inference")
-    #yes가 1임
-
-    model = prepare_model()
-    model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
-    model.to(device)
-    model.eval()
-
-    feature = feature.unsqueeze(0)
-    expanded_data = torch.stack([feature]*3, dim=1)
-    expanded_data = expanded_data.to(device)
-    output = model(expanded_data)
-    pred = get_likely_index(output)
-
-    print( output )
-    print( "이상치 감지" if int(pred[0]) == 1 else "이상치 불검출")
-    horn = True if int(pred[0]) == 1 else False
-    return horn
-
-def predict_location(peak, average_velocity):
-    data = pd.DataFrame({"peak": [peak], "average_velocity(km)":[average_velocity]})
-    regressor = joblib.load(config_dict['regressor'])
-    prediction = regressor.predict(data)
-    print( "위치 추정: ", str(prediction[0]) + "m" )
-
-def main(train_type):
+def main(train_type, mode="lightweight"):
     restrict_seed(42)
 
     # 수소열차인지 차세대 열차인지 구분
@@ -81,6 +56,17 @@ def main(train_type):
     isHorn = predict_anomaly(feature, config_dict['detector_path'], "cpu")
 
     if isHorn is True:
+        if mode == "high_accuracy":
+            print("음원 분리 실행")
+
+            torchaudio.save("source/result/sample_sound/horn_detected_noisy.wav", audio_noisy_sample.unsqueeze(0), 25600)
+            sound1_path, sound2_path = sound_separation("source/result/sample_sound/horn_detected_noisy.wav")
+
+            print("음원 분리 완료")
+            waveform_separated, sample_rate = torchaudio.load( sound1_path )
+            audio_sample_separated = F.resample(waveform_separated[0], sample_rate, 25600, lowpass_filter_width=6)
+            feature = db_converter(mel_converter(audio_sample_separated))
+
         # 위치 추정을 위해 horn의 peak시간과 열차가 감지된 시간을 체크합니다. (channel 97트리거 이용)
         start_sec, end_sec, peak_sec = extractInformationFromNumpy(RawData_tdms, feature)
         velocity = calculateAverageVelocity(train_length, start_sec, end_sec)
@@ -91,8 +77,8 @@ def main(train_type):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='train anomaly detection')
     parser.add_argument('--traintype', type=str, default='hydrogen', choices=['hydrogen', 'newgen'])
-
+    parser.add_argument('--mode', type=str, default='lightweight', choices=['lightweight', 'high_accuracy'])
     args = parser.parse_args()
-    main(args.traintype)
+    main(args.traintype, mode=args.mode)
 
 # python -m source.main.inference.detect

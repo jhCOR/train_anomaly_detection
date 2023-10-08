@@ -13,3 +13,4 @@ torch
 torchaudio
 torchvision
 tqdm
+speechbrain
