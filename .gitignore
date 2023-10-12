@@ -1,7 +1,7 @@
 __pycache__/
 audio_cache
 anomal_venv
-
+pretrained_models
 *.avi
 source/result/wav/*
 *.tdms
