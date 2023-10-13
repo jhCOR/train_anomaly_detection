@@ -3,7 +3,7 @@
   출근시간 열차지연 불편 뿐 아니라 인명/재산상의 피해를 발생시킬 수 있는 기차/열차 사고 사전에 막을 수는 없을까요?
 </p>
 <p align="center">
-  <img width="80%" src="https://github.com/IIP-LAB-TEAM/train_anomaly_detection/assets/63538097/894e4c8f-fc3c-4d4a-bfdc-061f8e80c8e6">
+  <img width="80%" src="./img/introduce.png">
 </p>
 
 ### 프로젝트 소개‼️
@@ -42,6 +42,16 @@
 <br> channel97번의 트리거 신호를 이용하여 열차 속도를 추정하고,
 <br> spectrogram을 db scale로 변환하여 horn발생이 최대가 되는 시간대를 찾아낸 후
 linear regressor를 통해 이상 소음원의 위치를 추정합니다.
+
+<table>
+    <tr>
+      <td width="30%">
+          <p align="center">
+            <img width="100%" src="./img/train_result.png">
+          </p>
+      </td>
+    </tr>
+</table>
 
 ### 설치 및 실행
 ```bash
@@ -95,4 +105,46 @@ python -m source.main.inference.detect
     </tr>
 </table>
 
+<table>
+    <tr>
+        <td width="30%">
+          <p align="center">
+            <img width="200"src="https://github.com/IIP-LAB-TEAM/train_anomaly_detection/assets/63538097/d5eebdb5-64e3-44b5-bcd2-3960b1e73c55">
+          </p>
+        </td>
+        <td width="30%">
+            <p align="center">
+              <img width="200"src="https://github.com/IIP-LAB-TEAM/train_anomaly_detection/assets/63538097/d5eebdb5-64e3-44b5-bcd2-3960b1e73c55">
+            </p>
+        </td>
+    </tr>
+    <tr>
+        <td align="center">
+           <table>
+              <td>
+               <div align="center">김연진
+              </td>
+              <td>
+                <img src="https://img.shields.io/badge/Github-jhCOR-black"/>
+              </td>
+               <td>
+                 <img src="https://img.shields.io/badge/Gmail-ji9759@u.sogang.ac.kr-blue"/>
+              </td>
+            </table>
+        </td>
+        <td align="center">
+           <table>
+              <td>
+               <div align="center">김태한
+              </td>
+              <td>
+                <img src="https://img.shields.io/badge/Github-@@-black"/>
+              </td>
+               <td>
+                 <img src="https://img.shields.io/badge/Gmail-@@-blue"/>
+              </td>
+            </table>
+        </td>
+    </tr>
+</table>
 Author: jhCOR[TEAM IIP LAP(member: jhCOR, jaehyun-ko)]
