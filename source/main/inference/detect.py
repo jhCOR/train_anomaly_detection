@@ -53,7 +53,7 @@ def main(train_type, mode="lightweight"):
 
     feature = db_converter(mel_converter(audio_sample))
 
-    isHorn = predict_anomaly(feature, config_dict['detector_path'], "cpu")
+    isHorn = predict_anomaly(feature, config_dict['detector_path'], "cpu", mode=mode)
 
     if isHorn is True:
         if mode == "high_accuracy":
