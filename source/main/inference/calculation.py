@@ -39,3 +39,19 @@ def plot(original, new, path=["source/main/inference/plot_clean.png", "source/ma
     plt.plot(new[::3])
     plt.savefig(path[1])
     print("plot 완료(저장위치: source/main/inference/ )")
+
+def plot_spectrogram(spectrogram1, spectrogram2, title=None, ylabel="freq_bin", path="source/main/inference/spectro.png"):
+    plt.clf()
+    fig, axs = plt.subplots(1, 2, figsize=(10, 5))
+    axs[0].set_title(title or "Spectrogram")
+    axs[0].set_ylabel(ylabel)
+    axs[0].set_xlabel("frame")
+    im = axs[0].imshow(librosa.power_to_db(spectrogram1), origin="lower", aspect="auto")
+
+    axs[1].set_title(title or "Spectrogram")
+    axs[1].set_ylabel(ylabel)
+    axs[1].set_xlabel("frame")
+    im = axs[1].imshow(librosa.power_to_db(spectrogram1), origin="lower", aspect="auto")
+    fig.colorbar(im, ax=axs)
+    plt.show(block=False)
+    plt.savefig(path)

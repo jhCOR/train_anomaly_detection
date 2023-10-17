@@ -56,16 +56,16 @@ def main(train_type, mode="lightweight"):
     isHorn = predict_anomaly(feature, config_dict['detector_path'], "cpu", mode=mode)
 
     if isHorn is True:
-        if mode == "high_accuracy":
-            print("음원 분리 실행")
+        # if mode == "high_accuracy":
+        #     print("음원 분리 실행")
 
-            torchaudio.save("source/result/sample_sound/horn_detected_noisy.wav", audio_noisy_sample.unsqueeze(0), 25600)
-            sound1_path, sound2_path = sound_separation("source/result/sample_sound/horn_detected_noisy.wav")
+        #     torchaudio.save("source/result/sample_sound/horn_detected_noisy.wav", audio_noisy_sample.unsqueeze(0), 25600)
+        #     sound1_path, sound2_path = sound_separation("source/result/sample_sound/horn_detected_noisy.wav")
 
-            print("음원 분리 완료")
-            waveform_separated, sample_rate = torchaudio.load( sound1_path )
-            audio_sample_separated = F.resample(waveform_separated[0], sample_rate, 25600, lowpass_filter_width=6)
-            feature = db_converter(mel_converter(audio_sample_separated))
+        #     print("음원 분리 완료")
+        #     waveform_separated, sample_rate = torchaudio.load( sound1_path )
+        #     audio_sample_separated = F.resample(waveform_separated[0], sample_rate, 25600, lowpass_filter_width=6)
+        #     feature = db_converter(mel_converter(audio_sample_separated))
 
         # 위치 추정을 위해 horn의 peak시간과 열차가 감지된 시간을 체크합니다. (channel 97트리거 이용)
         start_sec, end_sec, peak_sec = extractInformationFromNumpy(RawData_tdms, feature)

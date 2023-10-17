@@ -13,9 +13,17 @@ def sound_separation(sound_path):
     sound1 = est_sources[:, :, 0].detach().cpu()
     sound2 = est_sources[:, :, 1].detach().cpu()
 
-    path = ["source/main/inference/plot_sound1.png", "source/main/inference/plot_sound2.png"]
-    plot(sound1[0][::2], sound2[0][::2], path=path)
-    torchaudio.save("source1hat.wav", sound1, 8000)
-    torchaudio.save("source2hat.wav", sound2, 8000)
+    path_1 = ["source/main/inference/plot_sound1.png", "source/main/inference/plot_sound2.png"]
+    path_2 = "source/main/inference/spectrogram_sound.png"
 
-    return "source1hat.wav", "source2hat.wav"
+    mel_converter = torchaudio.transforms.MelSpectrogram(sample_rate=25600, n_mels=80)
+    db_converter = torchaudio.transforms.AmplitudeToDB()
+    feature_1 = db_converter(mel_converter(sound1[0][::2]))
+    feature_2 = db_converter(mel_converter(sound2[0][::2]))
+
+    plot(sound1[0][::2], sound2[0][::2], path=path_1)
+    plot_spectrogram(feature_1, feature_2, path=path_2)
+    torchaudio.save("source/main/inference/source1hat.wav", sound1, 8000)
+    torchaudio.save("source/main/inference/source2hat.wav", sound2, 8000)
+
+    return "source/main/inference/source1hat.wav", "source/main/inference/source2hat.wav"
