@@ -15,9 +15,9 @@ from .sound_spearation import sound_separation
 
 train_dict = {"hydrogen": 44, "newgen": 122}
 config_dict = {"detector_path": "source/result/trained_model/best_model.pt",
-               "regressor": "source/result/trained_model/linear_regression.pkl",
+               "regressor": "source/result/trained_model/xgb_regressor.model",
                "clean_sound_path": "source/result/sample_sound/generated_clean_sound.wav",
-               "sample_tdms":"./data/221109_hydrogen/S206/test_2.tdms"}
+               "sample_tdms":"./data/221103_nextgen/S206/test_04.tdms"}
 
 def restrict_seed(seed):
     print("시드 고정: ", seed)
@@ -29,7 +29,8 @@ def restrict_seed(seed):
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
 
-def main(train_type, mode="lightweight"):
+def main(train_type, mode="lightweight", path=None):
+    config_dict['sample_tdms'] = path
     restrict_seed(42)
 
     # 수소열차인지 차세대 열차인지 구분
@@ -78,7 +79,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='train anomaly detection')
     parser.add_argument('--traintype', type=str, default='hydrogen', choices=['hydrogen', 'newgen'])
     parser.add_argument('--mode', type=str, default='lightweight', choices=['lightweight', 'high_accuracy'])
+    parser.add_argument('--path', type=str, default='./data/221103_nextgen/S206/test_04.tdms')
     args = parser.parse_args()
-    main(args.traintype, mode=args.mode)
+    main(args.traintype, mode=args.mode, path=args.path)
 
-# python -m source.main.inference.detect
+# python -m source.main.inference.detect --traintype newgen

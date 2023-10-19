@@ -5,7 +5,7 @@ from .detect import config_dict
 from .model import prepare_model
 from .calculation import *
 import copy
-
+import xgboost
 class Ensemble():
   def __init__(self):
     dir = "source/result/trained_model/"
