@@ -85,7 +85,7 @@ python -m source.main.inference.detect
                 <img src="https://img.shields.io/badge/Github-jhCOR-black"/>
               </td>
                <td>
-                 <img src="https://img.shields.io/badge/Gmail-ji9759@u.sogang.ac.kr-blue"/>
+                 <img src="https://img.shields.io/badge/Github-@@-black"/>
               </td>
             </table>
         </td>
@@ -128,7 +128,7 @@ python -m source.main.inference.detect
                 <img src="https://img.shields.io/badge/Github-jhCOR-black"/>
               </td>
                <td>
-                 <img src="https://img.shields.io/badge/Gmail-ji9759@u.sogang.ac.kr-blue"/>
+                 <img src="https://img.shields.io/badge/Github-@@-black"/>
               </td>
             </table>
         </td>
