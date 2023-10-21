@@ -12,21 +12,39 @@ def get_likely_index(tensor):
 
 def calculateAverageVelocity(train_length, start, end):
     average_velocity = ( train_length * 0.001)  / ( ( end - start ) / 3600)
+    average_velocity = 80 if average_velocity>80 else average_velocity
     return average_velocity
 
+def calculatePosition(peak, start, velocity):
+    position = ( peak - start) * ( velocity ) - 22
+    return position
+    
 def calculatePeakPoint(total_time, waveform, criteria="mean"):
     print("spectrogram을 db scale로 변환하여 주파수 "+ criteria+"의 최대 지점을 추산합니다.")
     waveform_as_power = librosa.power_to_db(waveform)
-    if criteria == "mean":
-        mean_list = np.mean(waveform_as_power, axis=0)
-        mean_peak = np.argmax(mean_list)
-        peak_time = ( mean_peak / len(mean_list) ) * total_time
-        return peak_time
-    elif criteria == "median":
-        median_list = np.median(waveform_as_power, axis=0)
-        median_peak = np.argmax(median_list)
-        peak_time = ( median_peak / len(median_list) ) * total_time
-        return median_peak
+
+    mean_list_1 = np.mean(waveform_as_power, axis=0)
+    mean_peak_1 = np.argmax(mean_list_1)
+    peak_time_1 = ( mean_peak_1 / len(mean_list_1) ) * total_time
+
+    median_list = np.median(waveform_as_power, axis=0)
+    median_peak = np.argmax(median_list)
+    peak_time_2 = ( median_peak / len(median_list) ) * total_time
+    print("peak 탐지: ", peak_time_1, "중앙값 peak: ", peak_time_2)
+
+    peak_avg = (float(peak_time_1) + float(peak_time_2)) / 2
+    return peak_avg
+    # if criteria == "mean":
+    #     mean_list = np.mean(waveform_as_power, axis=0)
+    #     mean_peak = np.argmax(mean_list)
+    #     peak_time = ( mean_peak / len(mean_list) ) * total_time
+    #     return peak_time
+    # elif criteria == "median":
+    #     median_list = np.median(waveform_as_power, axis=0)
+    #     median_peak = np.argmax(median_list)
+    #     peak_time = ( median_peak / len(median_list) ) * total_time
+    #     return median_peak
+    
 
 
 def plot(original, new, path=["source/main/inference/plot_clean.png", "source/main/inference/plot_noisy.png"]):
@@ -55,3 +73,4 @@ def plot_spectrogram(spectrogram1, spectrogram2, title=None, ylabel="freq_bin", 
     fig.colorbar(im, ax=axs)
     plt.show(block=False)
     plt.savefig(path)
+    print("plot 완료(저장위치: ", path, ")")

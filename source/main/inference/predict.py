@@ -34,7 +34,7 @@ class Ensemble():
     return ensemble_output
   
 def predict_anomaly(feature, model_path, device, mode="lightweight"):
-    print("start inference")
+    print("<<<---start inference--->>>")
     #yes가 1임
 
     if mode == "lightweight":
@@ -60,6 +60,22 @@ def predict_anomaly(feature, model_path, device, mode="lightweight"):
 
 def predict_location(peak, average_velocity):
     data = pd.DataFrame({"peak": [peak], "average_velocity(km)":[average_velocity]})
-    regressor = joblib.load(config_dict['regressor'])
-    prediction = regressor.predict(data)
-    print( "위치 추정: ", str(prediction[0]) + "m" )
+
+    try:
+        regressor = xgboost.XGBRegressor(n_estimators=100, learning_rate=0.05, gamma=0, subsample=0.75, colsample_bytree=1, max_depth=5)
+        regressor.load_model(config_dict['regressor'])
+
+        # regressor_2 = xgboost.XGBRegressor(n_estimators=30, learning_rate=0.05, gamma=0, subsample=0.75, colsample_bytree=1, max_depth=5)
+        # regressor_2.load_model("source/result/trained_model/xgb_regressor.model")
+
+        linear_regressor = joblib.load("source/result/trained_model/linear_regression.pkl")
+
+        prediction_1 = regressor.predict(data.values)
+        prediction_2 = linear_regressor.predict(data.values)
+        # prediction_3 = regressor.predict(data.values)
+
+    except Exception as e:
+        print(e)
+    print(data, prediction_1, prediction_2)
+    prediction = prediction_1[0]
+    print( "위치 추정: ", str(prediction) + "m" )

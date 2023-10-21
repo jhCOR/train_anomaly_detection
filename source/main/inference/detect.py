@@ -15,9 +15,9 @@ from .sound_spearation import sound_separation
 
 train_dict = {"hydrogen": 44, "newgen": 122}
 config_dict = {"detector_path": "source/result/trained_model/best_model.pt",
-               "regressor": "source/result/trained_model/xgb_regressor.model",
+               "regressor": "source/result/trained_model/xgb_regressor_100.model",
                "clean_sound_path": "source/result/sample_sound/generated_clean_sound.wav",
-               "sample_tdms":"./data/221103_nextgen/S206/test_04.tdms"}
+               "sample_tdms":"./data/221103_nextgen/S206/test_01.tdms"}
 
 def restrict_seed(seed):
     print("시드 고정: ", seed)
@@ -29,8 +29,7 @@ def restrict_seed(seed):
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
 
-def main(train_type, mode="lightweight", path=None):
-    config_dict['sample_tdms'] = path
+def main(train_type, mode="lightweight", path=config_dict['sample_tdms']):
     restrict_seed(42)
 
     # 수소열차인지 차세대 열차인지 구분
@@ -39,7 +38,8 @@ def main(train_type, mode="lightweight", path=None):
 
     # extractSoundAndDataFromTDMS 메서드로 LPData와 RawDate의 97번 채널 데이터를 추출합니다. 
     # LPData는 편의상 wav파일로 별도 저장합니다. 
-    LPData_tdms, RawData_tdms = extractSoundAndDataFromTDMS(config_dict['sample_tdms'], config_dict['clean_sound_path'])
+    print(config_dict)
+    LPData_tdms, RawData_tdms = extractSoundAndDataFromTDMS(path, config_dict['clean_sound_path'])
     assert (RawData_tdms is not None) | (LPData_tdms is not None), "tdms파일 추출 오류"
 
     # real world appliacation을 위해 깨끗한 데이터에 다른 소리를 병합합니다. 
@@ -79,7 +79,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='train anomaly detection')
     parser.add_argument('--traintype', type=str, default='hydrogen', choices=['hydrogen', 'newgen'])
     parser.add_argument('--mode', type=str, default='lightweight', choices=['lightweight', 'high_accuracy'])
-    parser.add_argument('--path', type=str, default='./data/221103_nextgen/S206/test_04.tdms')
+    parser.add_argument('--path', type=str, default=config_dict['sample_tdms'])
     args = parser.parse_args()
     main(args.traintype, mode=args.mode, path=args.path)
 
