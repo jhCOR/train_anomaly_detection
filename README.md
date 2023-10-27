@@ -43,16 +43,6 @@
 <br> spectrogram을 db scale로 변환하여 horn발생이 최대가 되는 시간대를 찾아낸 후
 linear regressor를 통해 이상 소음원의 위치를 추정합니다.
 
-<table>
-    <tr>
-      <td width="30%">
-          <p align="center">
-            <img width="100%" src="./img/train_result.png">
-          </p>
-      </td>
-    </tr>
-</table>
-
 ### 설치 및 실행
 ```bash
 $ git clone https://github.com/IIP-LAB-TEAM/train_anomaly_detection.git
